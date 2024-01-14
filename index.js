@@ -5,7 +5,7 @@ const todoList = document.querySelector(".todo-list");
 
 // Event listener
 todoButoon.addEventListener("click", addTodo);
-
+todoList.addEventListener("click", deleteAndCheckClick);
 function addTodo(event) {
   //Prevent from from submitting
   event.preventDefault();
@@ -25,7 +25,7 @@ function getTodo(inputText) {
   //check button
   const completeButton = document.createElement("button");
   completeButton.innerHTML = '<i class="fa-solid fa-check"></i>';
-  completeButton.classList.add("completd-btn");
+  completeButton.classList.add("completed-btn");
   outerDiv.appendChild(completeButton);
 
   //trash button
@@ -34,4 +34,20 @@ function getTodo(inputText) {
   deleteButton.classList.add("delete-btn");
   outerDiv.appendChild(deleteButton);
   return outerDiv;
+}
+
+function deleteAndCheckClick(event) {
+  console.log(event.target);
+  const clickItem = event.target;
+  if (clickItem.classList[0] === "delete-btn") {
+    const todo = clickItem.parentElement;
+    todo.classList.add("fall");
+    todo.addEventListener("transitionend", function () {
+      todo.remove();
+    });
+  }
+  if (clickItem.classList[0] === "completed-btn") {
+    const todo = clickItem.parentElement;
+    todo.classList.toggle("completed");
+  }
 }

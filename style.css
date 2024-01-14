@@ -63,6 +63,7 @@ form button:hover {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    transition: all 0.5s ease;
 }
 
 .todo li {
@@ -70,7 +71,7 @@ form button:hover {
 }
 
 .delete-btn,
-.completd-btn {
+.completed-btn {
     background: rgb(54, 71, 69);
     color: white;
     border: none;
@@ -78,10 +79,25 @@ form button:hover {
     padding: 1rem;
 }
 
-.completd-btn {
+.completed-btn {
     background: green;
 }
 
 .todo-item {
     padding: 0rem 0.5rem;
+}
+
+.fa-trash,
+.fa-check {
+    pointer-events: none;
+}
+
+.completed {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+.fall {
+    transform: translateY(8rem) rotate(20deg);
+    opacity: 0;
 }
