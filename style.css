@@ -101,3 +101,34 @@ form button:hover {
     transform: translateY(8rem) rotate(20deg);
     opacity: 0;
 }
+
+select {
+    color: rgba(64, 105, 132, 1);
+    width: 10rem;
+    outline: none;
+    border: none;
+    appearance: none;
+    padding: 1rem;
+}
+
+.select {
+    margin: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.select::after {
+    content: "\25BC";
+    position: absolute;
+    background: rgb(54, 71, 69);
+    color: rgba(86, 172, 161, 1);
+    top: 0;
+    right: 0;
+    padding: 1rem;
+    pointer-events: none;
+}
+
+.select:hover::after {
+    background: rgba(86, 172, 161, 1);
+    color: rgb(54, 71, 69);
+}
