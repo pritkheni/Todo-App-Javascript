@@ -66,13 +66,10 @@ function deleteAndCheckClick(event) {
     todo.classList.add("fall");
     todo.addEventListener("transitionend", function () {
       const index = todoState.todo.findIndex((element) => {
-        console.log(element.id);
-        console.log(element.id == todo.id);
         return element.id == todo.id;
       });
       if (index >= 0) {
         todoState.todo.splice(index, 1);
-        console.log(todoState.todo);
         saveTodo();
       }
       todo.remove();
@@ -90,31 +87,25 @@ function deleteAndCheckClick(event) {
 function fillterTodoOption(event) {
   switch (event.target.value) {
     case "all":
-      console.log("all");
-      console.log(todoState.todo);
       renderAllTodo(todoState.todo);
       break;
     case "complete":
-      console.log(
-        JSON.stringify(todoState.todo.filter((element) => element.isCompleted))
-      );
       renderAllTodo(todoState.todo.filter((element) => element.isCompleted));
       break;
     case "uncompleted":
-      console.log(todoState.todo.filter((element) => !element.isCompleted));
       renderAllTodo(todoState.todo.filter((element) => !element.isCompleted));
       break;
   }
 }
 
 function renderAllTodo(todos) {
+  //dom diff calculation
   let temp = new Map();
   const oldNodes = todoList.children;
   if (todos.length == 0) todoList.innerHTML = "";
   if (oldNodes.length > todos.length) {
     for (let i = todos.length; i < oldNodes.length; i++) {
       const element = oldNodes[i];
-      console.log(element);
       temp.set(element.id, element);
     }
   }
@@ -159,11 +150,8 @@ function renderAllTodo(todos) {
   temp.forEach((values, _keys) => {
     try {
       values.remove();
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   });
-  console.log(temp);
 }
 
 function saveTodo() {
