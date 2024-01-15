@@ -2,22 +2,24 @@
 const todoInput = document.querySelector(".todo-input");
 const todoButoon = document.querySelector(".todo-button");
 const todoList = document.querySelector(".todo-list");
+const fillterTodo = document.querySelector(".fillter-todo");
 const todoState = {
   todo: [],
 };
 
 // Event listener
 document.addEventListener("DOMContentLoaded", function () {
-  console.log(`controle reach here`);
   let getTodoFromStore = localStorage.getItem("saved-todo");
   if (getTodoFromStore) {
     todoState.todo = JSON.parse(getTodoFromStore);
-    renderAllTodo();
+    renderAllTodo(todoState.todo);
   }
 });
 
 todoButoon.addEventListener("click", addTodo);
 todoList.addEventListener("click", deleteAndCheckClick);
+fillterTodo.addEventListener("click", fillterTodoOption);
+
 function addTodo(event) {
   //Prevent form from submitting
   event.preventDefault();
@@ -28,7 +30,7 @@ function addTodo(event) {
   };
   todoState.todo.push(newTodo);
   saveTodo();
-  renderAllTodo();
+  renderAllTodo(todoState.todo);
   todoInput.value = "";
 }
 
@@ -63,13 +65,16 @@ function deleteAndCheckClick(event) {
     const todo = clickItem.parentElement;
     todo.classList.add("fall");
     todo.addEventListener("transitionend", function () {
-      const index = todoState.todo.findIndex(
-        (element) => element.id === todo.id
-      );
-      if (index > 0) {
+      const index = todoState.todo.findIndex((element) => {
+        console.log(element.id);
+        console.log(element.id == todo.id);
+        return element.id == todo.id;
+      });
+      if (index >= 0) {
         todoState.todo.splice(index, 1);
+        console.log(todoState.todo);
+        saveTodo();
       }
-      saveTodo();
       todo.remove();
     });
   }
@@ -78,46 +83,87 @@ function deleteAndCheckClick(event) {
     const findedTodo = todoState.todo.find((element) => element.id == id);
     findedTodo.isCompleted = !findedTodo.isCompleted;
     saveTodo();
-    renderAllTodo();
+    renderAllTodo(todoState.todo);
   }
 }
 
-function renderAllTodo() {
+function fillterTodoOption(event) {
+  switch (event.target.value) {
+    case "all":
+      console.log("all");
+      console.log(todoState.todo);
+      renderAllTodo(todoState.todo);
+      break;
+    case "complete":
+      console.log(
+        JSON.stringify(todoState.todo.filter((element) => element.isCompleted))
+      );
+      renderAllTodo(todoState.todo.filter((element) => element.isCompleted));
+      break;
+    case "uncompleted":
+      console.log(todoState.todo.filter((element) => !element.isCompleted));
+      renderAllTodo(todoState.todo.filter((element) => !element.isCompleted));
+      break;
+  }
+}
+
+function renderAllTodo(todos) {
   let temp = new Map();
-  let oldNodes = todoList.children;
-  for (let i = 0; i < todoState.todo.length; i++) {
-    const element = todoState.todo[i];
+  const oldNodes = todoList.children;
+  if (todos.length == 0) todoList.innerHTML = "";
+  if (oldNodes.length > todos.length) {
+    for (let i = todos.length; i < oldNodes.length; i++) {
+      const element = oldNodes[i];
+      console.log(element);
+      temp.set(element.id, element);
+    }
+  }
+
+  for (let i = 0; i < todos.length; i++) {
+    const element = todos[i];
     if (oldNodes.length == 0) {
       const todo = getTodo(element);
       todoList.appendChild(todo);
-    } else if (temp.length > 0 && temp.get(element.id)) {
-      todoList.appendChild(temp.get(element.id));
+    } else if (temp.size > 0 && temp.get(element.id)) {
+      const el = temp.get(element.id);
+      if (i > oldNodes.length - 1) {
+        todoList.appendChild(el);
+      } else {
+        temp.set(oldNodes[i].id, oldNodes[i]);
+        oldNodes[i].remove();
+        oldNodes[i] = el;
+      }
+      temp.delete(element.id);
     } else if (i > oldNodes.length - 1) {
       const todo = getTodo(element);
       todoList.appendChild(todo);
     } else {
       const oldElement = oldNodes[i];
       if (oldElement.id != element.id) {
-        oldElement.remove();
-        temp.set(oldElement.id, oldElement);
-        const todo = getTodo(element);
-        todoList.appendChild(todo);
+        oldElement.id = element.id;
+      }
+      const oldTitl = oldElement.children[0].innerText;
+      const oldIsCheck = oldElement.classList.contains("completed");
+      if (oldTitl != element.title) {
+        oldElement.children[0].innerText = element.title;
+      }
+      if (element.isCompleted) {
+        if (!oldIsCheck) {
+          oldElement.classList.toggle("completed");
+        }
       } else {
-        const oldTitl = oldElement.children[0].innerText;
-        const oldIsCheck = oldElement.classList.contains("completed");
-        if (oldTitl != element.title) {
-          oldElement.children[0].innerText = element.title;
-        }
-        if (element.isCompleted) {
-          if (!oldIsCheck) {
-            oldElement.classList.toggle("completed");
-          }
-        } else {
-          if (oldIsCheck) oldElement.classList.remove("completed");
-        }
+        if (oldIsCheck) oldElement.classList.remove("completed");
       }
     }
   }
+  temp.forEach((values, _keys) => {
+    try {
+      values.remove();
+    } catch (err) {
+      console.log(err);
+    }
+  });
+  console.log(temp);
 }
 
 function saveTodo() {
